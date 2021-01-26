@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class FishBucket : MonoBehaviour
 {
-    public GameObject fish;
-
+    GameObject fish;
+    public bool inBucket;
     private void OnMouseDown()
     {
-        fish.SetActive(false);
+        if (GameObject.FindGameObjectsWithTag("Fish") != null)
+        {
+            fish = GameObject.FindGameObjectWithTag("Fish").gameObject;
+        }
+
+        Destroy(fish);
+        inBucket = true;
     }
 }

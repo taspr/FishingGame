@@ -4,38 +4,49 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public List<GameObject> fishes = new List<GameObject>();
+    GameObject fish;
     public GameObject fishIndicator;
-    public GameObject fish;
+    FishBucket fishBucket;
+    int fishIndex;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        fishBucket = GameObject.Find("Bucket").GetComponent<FishBucket>();
         StartCoroutine(ShowFishIndicator());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Mouse0))
         {
-            if (fishIndicator.activeSelf)
-                fish.SetActive(true);
-
-            if (fishIndicator.activeSelf)
+            if (fish == null && fishIndicator.activeSelf == true)
+            {
+                fishIndex = Random.Range(0, fishes.Count);
+                fish = fishes[fishIndex];
+                Instantiate(fish, new Vector3(0.73f, 1.42f, 0), fish.transform.rotation);
                 fishIndicator.SetActive(false);
+            }
+        }
 
-            
-        }    
+        if(fishBucket.inBucket)
+        {
+            fish = null;
+            fishBucket.inBucket = false;
+        }
     }
 
     IEnumerator ShowFishIndicator()
     {
-        while(true)
+        while (true)
         {
-            yield return new WaitForSeconds(3);
-            if(!fishIndicator.activeSelf)
+            if (fishIndicator.activeSelf == false)
+            {
+                // size of previous fish instead of current
+                fishIndicator.transform.localScale = new Vector3((fishIndex + 1)/2f, 0.01f, (fishIndex + 1)/2f);
                 fishIndicator.SetActive(true);
+            }
+            yield return new WaitForSeconds(3);
         }
-        
     }
 }
