@@ -5,48 +5,80 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public List<GameObject> fishes = new List<GameObject>();
-    GameObject fish;
+    public GameObject fish;
     public GameObject fishIndicator;
+    public GameObject fishingLine;
+    public int fishingLines = 3;
+    public float fishingLineBreakTime = 2.0f;
+    public float fishIndicatorMinTime = 0.5f;
+    public float fishIndicatorMaxTime = 2.0f;
     FishBucket fishBucket;
     int fishIndex;
 
     private void Start()
     {
         fishBucket = GameObject.Find("Bucket").GetComponent<FishBucket>();
-        StartCoroutine(ShowFishIndicator());
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Mouse0))
         {
-            if (fish == null && fishIndicator.activeSelf == true)
+            if (fish == null)
             {
+                fishingLine.SetActive(true);
                 fishIndex = Random.Range(0, fishes.Count);
                 fish = fishes[fishIndex];
-                Instantiate(fish, new Vector3(0.73f, 1.42f, 0), fish.transform.rotation);
+                fish.transform.position = new Vector3(0.73f, 1.36f, 0f);
+
+                StartCoroutine(ShowFishIndicator());
+                
+            }
+            else if(fishBucket.Fish == null && fishIndicator.activeSelf == true)
+            {
+                StopAllCoroutines();
+                //StopCoroutine(BreakFishingLine());
+                fishBucket.Fish = fish;
+                fish.SetActive(true);
                 fishIndicator.SetActive(false);
+                StartCoroutine(BreakFishingLine((fishes.Count - fishIndex)/2.0f));
             }
         }
 
-        if(fishBucket.inBucket)
+        if (fishBucket.inBucket)
         {
+            StopAllCoroutines();
+            fishingLine.SetActive(false);
             fish = null;
+            fishBucket.Fish = null;
             fishBucket.inBucket = false;
         }
     }
 
     IEnumerator ShowFishIndicator()
     {
-        while (true)
-        {
-            if (fishIndicator.activeSelf == false)
-            {
-                // size of previous fish instead of current
-                fishIndicator.transform.localScale = new Vector3((fishIndex + 1)/2f, 0.01f, (fishIndex + 1)/2f);
-                fishIndicator.SetActive(true);
-            }
-            yield return new WaitForSeconds(3);
-        }
+        fishingLineBreakTime = fishes.Count - fishIndex;
+        float fishIndicatorTime = Random.Range(fishIndicatorMinTime, fishIndicatorMaxTime);
+        yield return new WaitForSeconds(fishIndicatorTime);
+        fishIndicator.transform.localScale = new Vector3((fishIndex + 1) / 2f, 0.01f, (fishIndex + 1) / 2f);
+        fishIndicator.SetActive(true);
+        StartCoroutine(BreakFishingLine(fishingLineBreakTime));
     }
+
+    IEnumerator BreakFishingLine(float breakTime)
+    {
+        yield return new WaitForSeconds(breakTime);
+        fishingLines--;
+
+        if(fish != null)
+        {
+            fish.SetActive(false);
+        }
+
+        fish = null;
+        fishBucket.Fish = null;
+        fishIndicator.SetActive(false);
+        fishingLine.SetActive(false);
+    }
+
 }
