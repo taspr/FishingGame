@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,26 +11,36 @@ public class GameManager : MonoBehaviour
     public GameObject fishIndicator;
     public GameObject fishingLine;
     public GameObject sun;
+    public GameObject startMenu;
+    public GameObject leaderboard;
+    public GameObject gameOverMenu;
+    public TextMeshProUGUI scoreText;
     public int fishingLines = 3;
     public float fishingLineBreakTime = 2.0f;
     public float fishIndicatorMinTime = 0.5f;
     public float fishIndicatorMaxTime = 2.0f;
     private FishBucket fishBucket;
     private int fishIndex;
+    private Quaternion sunPrevRotation;
+    private Vector3 sunPrevPosition;
+    private int score;
 
-    private enum GameState
+    public enum GameState
     {
         PREGAME,
         PLAYING,
         PAUSED
     }
 
-    private GameState gameState = GameState.PREGAME;
+    public GameState gameState = GameState.PREGAME;
 
     private void Start()
     {
         fishBucket = GameObject.Find("Bucket").GetComponent<FishBucket>();
-        gameState = GameState.PLAYING;
+        sunPrevRotation = sun.transform.rotation;
+        sunPrevPosition = sun.transform.position;
+        score = 0;
+        scoreText.text = "Score: " + score;
     }
 
     private void Update()
@@ -36,6 +48,7 @@ public class GameManager : MonoBehaviour
         if (sun.transform.eulerAngles.x > 340.0f && sun.transform.eulerAngles.x < 350.0f)
         {
             gameState = GameState.PAUSED;
+            gameOverMenu.SetActive(true);
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse0) && gameState == GameState.PLAYING)
@@ -63,6 +76,8 @@ public class GameManager : MonoBehaviour
 
         if (fishBucket.inBucket)
         {
+            score += fishIndex + 1;
+            scoreText.text = "Score: " + score;
             StopAllCoroutines();
             fishingLine.SetActive(false);
             fish = null;
@@ -95,5 +110,34 @@ public class GameManager : MonoBehaviour
         fishBucket.Fish = null;
         fishIndicator.SetActive(false);
         fishingLine.SetActive(false);
+    }
+
+    public void PlayGame()
+    {
+        gameState = GameState.PLAYING;
+        startMenu.SetActive(false);
+        gameOverMenu.SetActive(false);
+        sun.transform.rotation = sunPrevRotation;
+        sun.transform.position = sunPrevPosition;
+        score = 0;
+        scoreText.text = "Score: " + score;
+        scoreText.gameObject.SetActive(true);
+        
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void ShowLeaderboard()
+    {
+        startMenu.SetActive(false);
+        leaderboard.SetActive(true);
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadSceneAsync(0);
     }
 }
