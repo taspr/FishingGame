@@ -5,6 +5,7 @@ using UnityEngine;
 public class FishBucket : MonoBehaviour
 {
     public GameObject Fish { get; set; }
+
     public bool inBucket;
 
     private void OnMouseDown()

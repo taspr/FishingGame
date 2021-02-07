@@ -9,8 +9,11 @@ public class UIManager : MonoBehaviour
     public GameObject startMenu;
     public GameObject leaderboard;
     public GameObject gameOverMenu;
-    private GameManager gameManager;
+    
     public TextMeshProUGUI scoreText;
+
+    private GameManager gameManager;
+
     private int score;
     public int Score
     {
@@ -26,6 +29,7 @@ public class UIManager : MonoBehaviour
     public void PlayGame()
     {
         gameManager.gameState = GameManager.GameState.PLAYING;
+
         startMenu.SetActive(false);
         gameOverMenu.SetActive(false);
         gameManager.ResetSun();
