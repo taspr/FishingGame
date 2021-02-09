@@ -1,25 +1,24 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public GameObject startMenu;
     public GameObject leaderboard;
     public GameObject gameOverMenu;
-    
+    public GameObject gamePlay;
+
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI highScoreText;
+    public TextMeshProUGUI endScoreText;
+    public List<Image> fishingLines = new List<Image>();
 
     private GameManager gameManager;
-
-    private int score;
-    public int Score
-    {
-        get { return score; }
-        set { score = value; }
-    }
+    public int Score { get; set; }
 
     private void Start()
     {
@@ -34,8 +33,13 @@ public class UIManager : MonoBehaviour
         gameOverMenu.SetActive(false);
         gameManager.ResetSun();
         ResetScore();
-        scoreText.gameObject.SetActive(true);
+        gamePlay.SetActive(true);
+        gameManager.fishingLines = 3;
 
+        foreach (Image fishingLine in fishingLines)
+        {
+            fishingLine.gameObject.SetActive(true);
+        }
     }
 
     public void ExitGame()
@@ -65,4 +69,18 @@ public class UIManager : MonoBehaviour
         Score += amount;
         scoreText.text = "Score: " + Score;
     }
+
+    public void HideFishingLine()
+    {
+        foreach (Image fishingLine in fishingLines)
+        {
+            if (fishingLine.gameObject.activeSelf)
+            {
+                fishingLine.gameObject.SetActive(false);
+                break;
+            }
+        }
+    }
+
+    
 }

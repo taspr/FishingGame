@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -42,10 +43,14 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (sun.transform.eulerAngles.x > 340.0f && sun.transform.eulerAngles.x < 350.0f)
+        if ((sun.transform.eulerAngles.x > 340.0f && sun.transform.eulerAngles.x < 350.0f) || fishingLines == 0)
         {
             gameState = GameState.PAUSED;
             uIManager.gameOverMenu.SetActive(true);
+            SaveHighScore();
+            uIManager.endScoreText.text = "Score: " + uIManager.Score.ToString();
+            if(PlayerPrefs.HasKey("highScore"))
+                uIManager.highScoreText.text = "High score: " + PlayerPrefs.GetString("highScore");
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse0) && gameState == GameState.PLAYING)
@@ -76,7 +81,7 @@ public class GameManager : MonoBehaviour
 
         if (fishBucket.inBucket)
         {
-            uIManager.UpdateScore(fishScript.size + 1);
+            uIManager.UpdateScore(fishScript.size);
             ResetFishing();
         }
     }
@@ -84,11 +89,11 @@ public class GameManager : MonoBehaviour
     private IEnumerator ShowFishIndicator()
     {
         fishingLineBreakTime = fishes.Count - fishScript.size;
-        float fishIndicatorTime = Random.Range(fishIndicatorMinTime, fishIndicatorMaxTime);
+        float fishIndicatorTime = UnityEngine.Random.Range(fishIndicatorMinTime, fishIndicatorMaxTime);
 
         yield return new WaitForSeconds(fishIndicatorTime);
 
-        fishIndicator.transform.localScale = new Vector3((fishScript.size + 1) / 2f, 0.01f, (fishScript.size + 1) / 2f); // fix numbers
+        fishIndicator.transform.localScale = new Vector3(fishScript.size / 2f, 0.01f, fishScript.size / 2f); // fix numbers
         fishIndicator.SetActive(true);
 
         StartCoroutine(BreakFishingLine(fishingLineBreakTime));
@@ -99,6 +104,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(breakTime);
 
         fishingLines--;
+        uIManager.HideFishingLine();
         ResetFishing();
     }
 
@@ -126,31 +132,48 @@ public class GameManager : MonoBehaviour
 
     private int SelectFish()
     {
-        int selectedFish = -1;
-
-        fishRarity = Random.Range(0, 101);
+        fishRarity = UnityEngine.Random.Range(0, 101);
 
         if (fishRarity <= 42)
         {
-            selectedFish = 0;
+            return 0;
         }
         else if (fishRarity >= 43 && fishRarity <= 72)
         {
-            selectedFish = 1;
+            return 1;
         }
         else if (fishRarity >= 73 && fishRarity <= 88)
         {
-            selectedFish = 2;
+            return 2;
         }
         else if (fishRarity >= 89 && fishRarity <= 96)
         {
-            selectedFish = 3;
+            return 3;
         }
         else if (fishRarity >= 97)
         {
-            selectedFish = 4;
+            return 4;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    private void SaveHighScore()
+    {
+        if (!PlayerPrefs.HasKey("highScore"))
+        {
+            PlayerPrefs.SetString("highScore", uIManager.Score.ToString());
         }
 
-        return selectedFish;
+        int savedHighScore = Int32.Parse(PlayerPrefs.GetString("highScore"));
+
+        if (savedHighScore < uIManager.Score)
+        {
+            PlayerPrefs.SetString("highScore", uIManager.Score.ToString());
+        }
+
+        PlayerPrefs.Save();
     }
 }
