@@ -49,8 +49,13 @@ public class GameManager : MonoBehaviour
             uIManager.gameOverMenu.SetActive(true);
             SaveHighScore();
             uIManager.endScoreText.text = "Score: " + uIManager.Score.ToString();
+
             if(PlayerPrefs.HasKey("highScore"))
+            {
                 uIManager.highScoreText.text = "High score: " + PlayerPrefs.GetString("highScore");
+            }
+                
+            StopAllCoroutines();
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse0) && gameState == GameState.PLAYING)
@@ -88,7 +93,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ShowFishIndicator()
     {
-        fishingLineBreakTime = fishes.Count - fishScript.size;
+        fishingLineBreakTime = ((fishes.Count + 2) - fishScript.size) / 2.0f;
+        print(fishingLineBreakTime);
         float fishIndicatorTime = UnityEngine.Random.Range(fishIndicatorMinTime, fishIndicatorMaxTime);
 
         yield return new WaitForSeconds(fishIndicatorTime);
@@ -176,4 +182,5 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.Save();
     }
+
 }

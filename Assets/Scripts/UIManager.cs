@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI highScoreText;
     public TextMeshProUGUI endScoreText;
+    public Image fishImage;
     public List<Image> fishingLines = new List<Image>();
 
     private GameManager gameManager;
@@ -82,5 +83,4 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    
 }
