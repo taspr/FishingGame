@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
 using System;
 
 public class GameManager : MonoBehaviour
@@ -58,7 +56,7 @@ public class GameManager : MonoBehaviour
             StopAllCoroutines();
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && gameState == GameState.PLAYING)
+        if (Input.GetMouseButtonDown(0) && gameState == GameState.PLAYING)
         {
             if (fish == null)
             {
@@ -94,7 +92,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator ShowFishIndicator()
     {
         fishingLineBreakTime = ((fishes.Count + 2) - fishScript.size) / 2.0f;
-        print(fishingLineBreakTime);
+        //print(fishingLineBreakTime);
         float fishIndicatorTime = UnityEngine.Random.Range(fishIndicatorMinTime, fishIndicatorMaxTime);
 
         yield return new WaitForSeconds(fishIndicatorTime);
